@@ -16,7 +16,17 @@ export async function messageCreate(message: Message): Promise<void> {
     if (message.channelId === "1088314628179755078") {
         if (message.content.startsWith(".")) return;
 
-        const response = await chatbot.chat(message.content);
+        const response = await chatbot.chat(message.content).catch(null);
+
+        if (!response) {
+            const embed = new EmbedBuilder()
+                .setTitle("❌ Error")
+                .setDescription("Failed to get a response from the chatbot\nPlease wait a few seconds and try again")
+                .setColor(0xED4245);
+
+            await message.reply({ embeds: [embed] });
+        }
+
         await message.reply({ content: response });
 
         return;
@@ -36,7 +46,7 @@ export async function messageCreate(message: Message): Promise<void> {
         return;
 
     const trigger = args.shift()!.toLowerCase().slice(botConfig.prefix.length);
-    const command = message.client.commands.get(trigger);
+    const command = message.client.textCommands.get(trigger);
 
     if (!command) return;
 

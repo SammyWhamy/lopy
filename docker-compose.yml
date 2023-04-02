@@ -1,13 +1,19 @@
 version: '3.8'
 
 services:
-  redis:
-    container_name: "redis"
-    image: "eqalpha/keydb:alpine"
+  lopy:
+    container_name: "lopy"
+    image: 'registry.ecchi.cloud/lopy'
     restart: unless-stopped
-    command: "keydb-server /etc/keydb/keydb.conf"
-    ports:
-      - "6379:6379"
     volumes:
-      - ./volumes/redis/data:/data
-      - ./volumes/redis/redis.conf:/etc/keydb/keydb.conf
+      - ./.env:/app/.env
+#  redis:
+#    container_name: "redis"
+#    image: "eqalpha/keydb:alpine"
+#    restart: unless-stopped
+#    command: "keydb-server /etc/keydb/keydb.conf"
+#    ports:
+#      - "6379:6379"
+#    volumes:
+#      - ./volumes/redis/data:/data
+#      - ./volumes/redis/redis.conf:/etc/keydb/keydb.conf

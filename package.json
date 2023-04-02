@@ -9,17 +9,25 @@
   "type": "module",
   "scripts": {
     "build": "yarn swc src -d dist",
-    "start": "node --enable-source-maps --trace-warnings dist/index.js"
+    "watch": "yarn swc src -d dist -w",
+    "start": "node --enable-source-maps --trace-warnings dist/index.js",
+    "register": "node --enable-source-maps --trace-warnings dist/register.js"
   },
   "dependencies": {
+    "@discordjs/rest": "^1.6.0",
     "chalk": "^5.2.0",
     "discord.js": "^14.8.0",
-    "dotenv": "^16.0.3"
+    "dotenv": "^16.0.3",
+    "mongoose": "^7.0.3",
+    "node-schedule": "^2.1.1"
   },
   "devDependencies": {
     "@swc/cli": "^0.1.62",
     "@swc/core": "^1.3.44",
     "@types/node": "^18.15.11",
+    "@types/node-schedule": "^2.1.0",
+    "chokidar": "^3.5.3",
+    "discord-api-types": "^0.37.37",
     "typescript": "^5.0.3"
   },
   "optionalDependencies": {
