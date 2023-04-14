@@ -1,12 +1,18 @@
-import { EmbedBuilder, Message } from "discord.js";
+import { EmbedBuilder, Message, MessageType } from "discord.js";
 import { botConfig } from "../config.js";
 import { Chatbot } from "../util/Chatbot.js";
 
 const chatbot = new Chatbot();
 
-export async function messageCreate(message: Message): Promise<void> {
+export async function messageCreate(message: Message) {
     if (message.channelId === botConfig.colorChannel) {
         await message.delete();
+        return;
+    }
+
+    if (message.type === MessageType.ChannelPinnedMessage) {
+        await message.delete();
+        await message.channel.send(`**${message.member?.nickname || message.author.username}** pinned a message to this channel. View pins here <#${botConfig.pins.channel}>.`);
         return;
     }
 

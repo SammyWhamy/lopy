@@ -26,6 +26,9 @@ function generatePrefix(level: LogLevel): string {
 }
 
 function error(...message: any[]): void {
+    if (JSON.stringify(message).includes("ExperimentalWarning"))
+        return;
+
     if (settings.logLevel >= 0)
         defaultLog(generatePrefix("error"), ...message);
 }

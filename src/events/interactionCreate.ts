@@ -1,7 +1,7 @@
 import type { Interaction } from "discord.js";
 import { EmbedBuilder } from "discord.js";
 
-export async function interactionCreate(interaction: Interaction): Promise<void> {
+export async function interactionCreate(interaction: Interaction) {
     if (interaction.isChatInputCommand()) {
         const command = interaction.client.slashCommands.get(interaction.commandName);
 
