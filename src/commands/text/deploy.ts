@@ -1,20 +1,18 @@
-import type { SlashCommand } from "discord.js";
-import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
+import type { TextCommand } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 import { botConfig } from "../../config.js";
 
-export const command: SlashCommand = {
-    data: new SlashCommandBuilder()
-        .setName("deploy")
-        .setDescription("Deploy slash commands"),
+export const command: TextCommand = {
+    name: "deploy",
 
-    async execute(interaction) {
-        if (interaction.user.id !== botConfig.owner) {
+    async execute(message) {
+        if (message.author.id !== botConfig.owner) {
             const embed = new EmbedBuilder()
                 .setTitle("❌ Error")
                 .setDescription("YOU ARE NOT SAMMY!!! GET OUT BITCH")
                 .setColor(0xED4245);
 
-            await interaction.reply({ embeds: [embed] });
+            await message.reply({ embeds: [embed] });
             return;
         }
 
@@ -22,10 +20,10 @@ export const command: SlashCommand = {
             .setTitle("📨 Deploying...")
             .setColor(0x5865F2);
 
-        await interaction.reply({ embeds: [embed] });
+        const reply = await message.reply({ embeds: [embed] });
 
         await import("dotenv/config");
-        await interaction.client.deployCommands();
+        await message.client.deployCommands();
 
         console.debug("Reloaded successfully");
 
@@ -33,6 +31,6 @@ export const command: SlashCommand = {
             .setTitle("📦 Deployed!")
             .setColor(0x57F287);
 
-        await interaction.editReply({ embeds: [embed] });
+        await reply.edit({ embeds: [embed] });
     },
 };
