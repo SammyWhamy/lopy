@@ -9,7 +9,7 @@ import "./services/extendConsole.js";
 
 process.on("unhandledRejection", (reason, promise) => {
     console.error(`Unhandled promise rejection: ${reason}`);
-    console.error(promise);
+    promise.catch(console.error);
 });
 
 const client = new Client(clientConfig);
