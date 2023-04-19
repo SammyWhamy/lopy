@@ -5,7 +5,7 @@ import { byPuuid } from "./routes/byPuuid.js";
 import { getStore } from "./routes/store.js";
 import { getUserInfo } from "./routes/userinfo.js";
 
-const redis = new Redis({ port: 6380 });
+const redis = new Redis(process.env.REDIS_URI!);
 
 export type UUID = `${string}-${string}-${string}-${string}-${string}`;
 
