@@ -1,5 +1,8 @@
 import type { Interaction } from "discord.js";
 import { EmbedBuilder } from "discord.js";
+import { generateStore } from "../commands/slash/store.js";
+import type { UUID } from "../riot/ValorantApi.js";
+import { ValorantApi } from "../riot/ValorantApi.js";
 
 export async function interactionCreate(interaction: Interaction) {
     if (interaction.isChatInputCommand()) {
@@ -37,5 +40,27 @@ export async function interactionCreate(interaction: Interaction) {
         await command.autocomplete(interaction);
 
         return;
+    }
+
+    if (interaction.isButton()) {
+        if (interaction.customId.startsWith("store:")) {
+            const [_, id, uuid, author] = interaction.customId.split(":") as [string, string, UUID, string];
+
+            if (interaction.user.id !== author) {
+                const embed = new EmbedBuilder()
+                    .setTitle("❌ Error")
+                    .setDescription("This is not your button!")
+                    .setColor(0xED4245);
+
+                await interaction.reply({ embeds: [embed], ephemeral: true });
+                return;
+            }
+
+            const api = new ValorantApi();
+            await api.getAccounts(id);
+
+            const reply = await generateStore(api, id, uuid, author);
+            await interaction.update(reply);
+        }
     }
 }

@@ -22,6 +22,6 @@ export const botConfig = {
     colorChannel: "1040374622417338418",
     pins: {
         id: "1096245426300133437",
-        channel: "1096226288416608306"
+        channel: "1096226288416608306",
     },
 };

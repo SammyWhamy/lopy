@@ -29,7 +29,7 @@ RUN yarn add -D @swc/cli @swc/core
 
 COPY package.json ./
 COPY .swcrc ./
-COPY src ./src
+COPY src ./src*
 
 RUN yarn build
 

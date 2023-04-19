@@ -23,7 +23,7 @@ export const command: TextCommand = {
 
         const reply = await message.reply({ embeds: [embed] });
 
-        const build = args.includes("--build") || args.includes("-b")
+        const build = args.includes("--build") || args.includes("-b");
 
         if (build) {
             embed

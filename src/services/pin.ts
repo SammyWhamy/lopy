@@ -19,11 +19,11 @@ export async function pinMessage(message: Message) {
         components: [{
             type: 1,
             components: [{
-                type: 2 ,
+                type: 2,
                 label: "Original message",
                 style: 5,
                 url: message.url,
-            }]
+            }],
         }],
     });
 
