@@ -8,8 +8,8 @@
   "license": "GPL-3.0",
   "type": "module",
   "scripts": {
-    "build": "yarn swc src -d dist",
-    "watch": "yarn swc src -d dist -w",
+    "build": "yarn swc ./src -d ./dist",
+    "watch": "yarn swc ./src -d ./dist -w",
     "start": "node --enable-source-maps --trace-warnings dist/index.js",
     "register": "node --enable-source-maps --trace-warnings dist/register.js"
   },
