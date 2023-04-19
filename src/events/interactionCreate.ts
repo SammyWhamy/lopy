@@ -1,5 +1,6 @@
 import type { Interaction } from "discord.js";
 import { EmbedBuilder } from "discord.js";
+import { generateAccountButtons } from "../commands/slash/accounts.js";
 import { generateStore } from "../commands/slash/store.js";
 import type { UUID } from "../riot/ValorantApi.js";
 import { ValorantApi } from "../riot/ValorantApi.js";
@@ -61,6 +62,36 @@ export async function interactionCreate(interaction: Interaction) {
 
             const reply = await generateStore(api, id, uuid, author);
             await interaction.update(reply);
+
+            return;
+        }
+
+        if (interaction.customId.startsWith("account:")) {
+            const [_, id, uuid] = interaction.customId.split(":") as [string, string, UUID];
+
+            if (interaction.user.id !== id) {
+                const embed = new EmbedBuilder()
+                    .setTitle("❌ Error")
+                    .setDescription("This is not your button!")
+                    .setColor(0xED4245);
+
+                await interaction.reply({ embeds: [embed], ephemeral: true });
+                return;
+            }
+
+            const api = new ValorantApi();
+            await api.setDefaultAccount(id, uuid);
+
+            const embed = new EmbedBuilder()
+                .setDescription("Default account set!")
+                .setColor(0x43B581);
+
+            const row = await generateAccountButtons(api, id);
+
+            await interaction.update({ components: [row] });
+            await interaction.followUp({ embeds: [embed], ephemeral: true });
+
+            return;
         }
     }
 }

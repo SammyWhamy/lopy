@@ -81,7 +81,7 @@ export async function generateStore(api: ValorantApi, id: string, uuid: UUID, au
         const storeItem = store.SkinsPanelLayout.SingleItemStoreOffers.find((i: any) => i.OfferID === o.uuid);
         const rarity = (await getSkinRarity(o.uuid))!;
         const rarityStyle = rarityMap[rarity];
-        const cost = storeItem.Cost["85ad13f7-3d1b-5128-9eb2-7cd8ee0b5741"];
+        const cost = storeItem!.Cost["85ad13f7-3d1b-5128-9eb2-7cd8ee0b5741"];
         const usdPrice = calculatePrice(cost);
 
         const embed = new EmbedBuilder()

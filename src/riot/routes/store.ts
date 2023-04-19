@@ -1,4 +1,106 @@
-export async function getStore(region: string, puuid: string, token: string, entitlements: string) {
+import type { Rarity } from "../util.js";
+import type { UUID } from "../ValorantApi.js";
+
+type Storefront = {
+    FeaturedBundle: {
+        Bundle: {
+            ID: UUID;
+            DataAssetID: UUID;
+            CurrencyID: UUID;
+            Items: {
+                Item: {
+                    ItemTypeID: UUID;
+                    ItemID: UUID;
+                    Quantity: number;
+                };
+                BasePrice: number;
+                CurrencyID: UUID;
+                DiscountPercent: number;
+                DiscountedPrice: number;
+                IsPromoItem: boolean;
+            }[];
+        };
+        Bundles: {
+            ID: UUID;
+            DataAssetID: UUID;
+            CurrencyID: UUID;
+            Items: {
+                Item: {
+                    ItemTypeID: UUID;
+                    ItemID: UUID;
+                    Quantity: number;
+                };
+                BasePrice: number;
+                CurrencyID: UUID;
+                DiscountPercent: number;
+                DiscountedPrice: number;
+                IsPromoItem: boolean;
+            }[];
+        }[];
+        BundleRemainingDurationInSeconds: number;
+    };
+    SkinsPanelLayout: {
+        SingleItemOffers: string[];
+        SingleItemStoreOffers: {
+            OfferID: string;
+            IsDirectPurchase: boolean;
+            StartDate: string;
+            Cost: {
+                [x: string]: number;
+            };
+            Rewards: {
+                ItemTypeID: UUID;
+                ItemID: UUID;
+                Quantity: number;
+            }[];
+        }[];
+        SingleItemOffersRemainingDurationInSeconds: number;
+    };
+    UpgradeCurrencyStore: {
+        UpgradeCurrencyOffers: {
+            OfferID: UUID;
+            StorefrontItemID: UUID;
+            Offer: {
+                OfferID: string;
+                IsDirectPurchase: boolean;
+                StartDate: string;
+                Cost: {
+                    [x: string]: number;
+                };
+                Rewards: {
+                    ItemTypeID: UUID;
+                    ItemID: UUID;
+                    Quantity: number;
+                }[];
+            };
+        }[];
+    };
+    BonusStore?: {
+        BonusStoreOffers: {
+            BonusOfferID: UUID;
+            Offer: {
+                OfferID: string;
+                IsDirectPurchase: boolean;
+                StartDate: string;
+                Cost: {
+                    [x: string]: number;
+                };
+                Rewards: {
+                    ItemTypeID: UUID;
+                    ItemID: UUID;
+                    Quantity: number;
+                }[];
+            };
+            DiscountPercent: number;
+            DiscountCosts: {
+                [x: string]: number;
+            };
+            IsSeen: boolean;
+        };
+    } | undefined;
+};
+
+export async function getStore(region: string, puuid: string, token: string, entitlements: string): Promise<Storefront> {
     const response = await fetch(`https://pd.${region}.a.pvp.net/store/v2/storefront/${puuid}`, {
         headers: {
             "Authorization": `Bearer ${token}`,
@@ -15,7 +117,19 @@ export async function getStore(region: string, puuid: string, token: string, ent
 }
 
 let storeOffersCache = {
-    data: [] as any[],
+    data: [] as {
+        offer_id: UUID,
+        cost: number,
+        name: string,
+        icon: string,
+        type: string,
+        skin_id: UUID,
+        content_tier: {
+            name: string,
+            dev_name: Rarity,
+            icon: string,
+        }
+    }[],
     expires: new Date(0),
 };
 

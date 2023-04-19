@@ -2,7 +2,7 @@ import { getStoreOffers } from "./routes/store.js";
 
 export type Rarity = "Select" | "Deluxe" | "Premium" | "Ultra" | "Exclusive";
 
-export async function getSkinRarity(uuid: string): Promise<Rarity | null> {
+export async function getSkinRarity(uuid: string): Promise<Rarity | undefined> {
     const offers = await getStoreOffers();
     const offer = offers.find((offer) => offer.offer_id === uuid);
     return offer?.content_tier.dev_name;

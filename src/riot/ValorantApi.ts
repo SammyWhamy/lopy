@@ -2,6 +2,7 @@ import { EventEmitter } from "events";
 import { Redis } from "ioredis";
 import { getAuth, postAuth, postEntitlement, putAuth, putAuthMfa } from "./routes/authorization.js";
 import { byPuuid } from "./routes/byPuuid.js";
+import { getParty, getPlayerParty } from "./routes/party.js";
 import { getStore } from "./routes/store.js";
 import { getUserInfo } from "./routes/userinfo.js";
 
@@ -172,5 +173,39 @@ export class ValorantApi extends EventEmitter {
         }
 
         return this.accounts;
+    }
+
+    async getPlayerParty(uuid: UUID | null = null) {
+        const account = this.getAccount(uuid);
+
+        if (!account) {
+            throw new Error("Not logged in");
+        }
+
+        if (account.token.expires < new Date()) {
+            await this.reAuth(account.puuid);
+        }
+
+        return await getPlayerParty(account);
+    }
+
+    async getParty(uuid: UUID | null = null) {
+        const account = this.getAccount(uuid);
+
+        if (!account) {
+            throw new Error("Not logged in");
+        }
+
+        if (account.token.expires < new Date()) {
+            await this.reAuth(account.puuid);
+        }
+
+        const playerParty = await this.getPlayerParty(uuid);
+        return await getParty(account, playerParty.CurrentPartyID);
+    }
+
+    async setDefaultAccount(id: string, uuid: UUID) {
+        await redis.hset(`valorant:auth:${id}`, "selected", uuid);
+        this.accounts.selected = uuid;
     }
 }

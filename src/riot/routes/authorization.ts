@@ -31,7 +31,19 @@ export async function postAuth() {
     return cookie;
 }
 
-export async function putAuth(username: string, password: string, cookie: string) {
+export type AuthResponse = {
+    mfa: {
+        cookie: string,
+        [x: string]: string,
+    } | null,
+    token: {
+        token: string,
+        ssid: string,
+        expires: Date,
+    } | null,
+}
+
+export async function putAuth(username: string, password: string, cookie: string): Promise<AuthResponse> {
     const response = await fetch(AUTH_ROUTE, {
         method: "PUT",
         headers: {
@@ -103,7 +115,7 @@ export async function putAuthMfa(cookie: string, code: string) {
         throw new Error(data.error);
     }
 
-    const token = data.response.parameters.uri.match(/access_token=(.*?)&/)?.[1];
+    const token = data.response.parameters.uri.match(/access_token=(.*?)&/)?.[1] as string;
     const ssid = response.headers.get("set-cookie")?.match(/(ssid=.*?);/)?.[1]!;
 
     return {
@@ -136,7 +148,7 @@ export async function getAuth(ssid: string) {
     };
 }
 
-export async function postEntitlement(token: string) {
+export async function postEntitlement(token: string): Promise<string> {
     const response = await fetch(ENTITLEMENTS_ROUTE, {
         method: "POST",
         headers: {
