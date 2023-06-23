@@ -19,7 +19,7 @@ export async function messageCreate(message: Message) {
     if (message.author.bot)
         return;
 
-    if (message.channelId === "1088314628179755078") {
+    if (message.channelId === "1121915280092827658") {
         if (message.content.startsWith(".")) return;
 
         const response = await chatbot.chat(message.content).catch(null);

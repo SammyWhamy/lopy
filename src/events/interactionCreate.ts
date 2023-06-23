@@ -1,6 +1,7 @@
 import type { Interaction } from "discord.js";
 import { EmbedBuilder } from "discord.js";
 import { generateAccountButtons } from "../commands/slash/accounts.js";
+import { generateParty } from "../commands/slash/party.js";
 import { generateStore } from "../commands/slash/store.js";
 import type { UUID } from "../riot/ValorantApi.js";
 import { ValorantApi } from "../riot/ValorantApi.js";
@@ -44,54 +45,92 @@ export async function interactionCreate(interaction: Interaction) {
     }
 
     if (interaction.isButton()) {
-        if (interaction.customId.startsWith("store:")) {
-            const [_, id, uuid, author] = interaction.customId.split(":") as [string, string, UUID, string];
+        try {
+            if (interaction.customId.startsWith("store:")) {
+                const [_, id, uuid, author] = interaction.customId.split(":") as [string, string, UUID, string];
 
-            if (interaction.user.id !== author) {
-                const embed = new EmbedBuilder()
-                    .setTitle("❌ Error")
-                    .setDescription("This is not your button!")
-                    .setColor(0xED4245);
+                if (interaction.user.id !== author) {
+                    const embed = new EmbedBuilder()
+                        .setTitle("❌ Error")
+                        .setDescription("This is not your button!")
+                        .setColor(0xED4245);
 
-                await interaction.reply({ embeds: [embed], ephemeral: true });
+                    await interaction.reply({ embeds: [embed], ephemeral: true });
+                    return;
+                }
+
+                const api = new ValorantApi();
+                await api.getAccounts(id);
+
+                const reply = await generateStore(api, id, uuid, author);
+                await interaction.update(reply);
+
                 return;
             }
 
-            const api = new ValorantApi();
-            await api.getAccounts(id);
+            if (interaction.customId.startsWith("party:")) {
+                const [_, id, uuid, author] = interaction.customId.split(":") as [string, string, UUID, string];
 
-            const reply = await generateStore(api, id, uuid, author);
-            await interaction.update(reply);
+                if (interaction.user.id !== author) {
+                    const embed = new EmbedBuilder()
+                        .setTitle("❌ Error")
+                        .setDescription("This is not your button!")
+                        .setColor(0xED4245);
 
-            return;
-        }
+                    await interaction.reply({ embeds: [embed], ephemeral: true });
+                    return;
+                }
 
-        if (interaction.customId.startsWith("account:")) {
-            const [_, id, uuid] = interaction.customId.split(":") as [string, string, UUID];
+                await interaction.deferUpdate();
 
-            if (interaction.user.id !== id) {
-                const embed = new EmbedBuilder()
-                    .setTitle("❌ Error")
-                    .setDescription("This is not your button!")
-                    .setColor(0xED4245);
+                const api = new ValorantApi();
+                await api.getAccounts(id);
 
-                await interaction.reply({ embeds: [embed], ephemeral: true });
+                const reply = await generateParty(api, id, uuid, author);
+                await interaction.editReply(reply);
+
                 return;
             }
 
-            const api = new ValorantApi();
-            await api.setDefaultAccount(id, uuid);
+            if (interaction.customId.startsWith("account:")) {
+                const [_, id, uuid] = interaction.customId.split(":") as [string, string, UUID];
+
+                if (interaction.user.id !== id) {
+                    const embed = new EmbedBuilder()
+                        .setTitle("❌ Error")
+                        .setDescription("This is not your button!")
+                        .setColor(0xED4245);
+
+                    await interaction.reply({ embeds: [embed], ephemeral: true });
+                    return;
+                }
+
+                const api = new ValorantApi();
+                await api.setDefaultAccount(id, uuid);
+
+                const embed = new EmbedBuilder()
+                    .setDescription("Default account set!")
+                    .setColor(0x43B581);
+
+                const row = await generateAccountButtons(api, id);
+
+                await interaction.update({ components: [row] });
+                await interaction.followUp({ embeds: [embed], ephemeral: true });
+
+                return;
+            }
+        } catch (error: any) {
+            console.error(error);
 
             const embed = new EmbedBuilder()
-                .setDescription("Default account set!")
-                .setColor(0x43B581);
+                .setTitle("❌ Error")
+                .setDescription(`An error occurred while executing this button.\n\`\`\`${error.message}\`\`\``)
+                .setColor(0xED4245);
 
-            const row = await generateAccountButtons(api, id);
-
-            await interaction.update({ components: [row] });
-            await interaction.followUp({ embeds: [embed], ephemeral: true });
-
-            return;
+            if (interaction.deferred)
+                await interaction.followUp({ embeds: [embed], ephemeral: true });
+            else
+                await interaction.reply({ embeds: [embed], ephemeral: true });
         }
     }
 }

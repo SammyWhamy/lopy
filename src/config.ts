@@ -19,9 +19,9 @@ export const clientConfig: ClientOptions = {
 export const botConfig = {
     prefix: "!",
     owner: "560821786011369472",
-    colorChannel: "1040374622417338418",
+    colorChannel: "1121637602580238426",
     pins: {
-        id: "1096245426300133437",
-        channel: "1096226288416608306",
+        id: "1121916155897065492",
+        channel: "1121915442794082344",
     },
 };
